@@ -1,0 +1,63 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: omnisense-mysql
+    restart: unless-stopped
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: omnisense_ai
+      MYSQL_USER: omnisense
+      MYSQL_PASSWORD: omnisense_password
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -proot_password || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  omnisense-app:
+    build:
+      context: .
+      dockerfile: ai-engine/Dockerfile
+    image: omnisense-ai-app:latest
+    container_name: omnisense-ai
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models:ro
+      - hf-cache:/app/.hf_cache
+    environment:
+      HF_HOME: /app/.hf_cache
+      OMNISENSE_MODEL_DIR: /app/models
+      OMNISENSE_DB_DRIVER: mysql
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: omnisense_ai
+      MYSQL_USER: omnisense
+      MYSQL_PASSWORD: omnisense_password
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: omnisense-frontend:latest
+    container_name: omnisense-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      - omnisense-app
+
+volumes:
+  hf-cache:
+  mysql-data:

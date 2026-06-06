@@ -1,0 +1,42 @@
+# Runtime data and local databases
+/data/
+*.sqlite
+*.sqlite3
+*.db
+
+# Local AI model artifacts
+/models/
+*.pt
+*.pth
+*.safetensors
+optimizer.pt
+scheduler.pt
+scaler.pt
+rng_state.pth
+training_args.bin
+
+# Node dependencies and build output
+node_modules/
+/frontend/node_modules/
+/frontend/dist/
+/backend/node_modules/
+/package-lock.json
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Local environment files
+.env
+.env.*
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
