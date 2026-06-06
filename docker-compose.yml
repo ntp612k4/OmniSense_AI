@@ -31,7 +31,7 @@ services:
     depends_on:
       - mysql
     ports:
-      - "8501:8501"
+      - "8502:8501"
     volumes:
       - ./data:/app/data
       - ./models:/app/models:ro
@@ -54,6 +54,7 @@ services:
     container_name: omnisense-frontend
     restart: unless-stopped
     ports:
+      - "8501:5173"
       - "5173:5173"
     depends_on:
       - omnisense-app

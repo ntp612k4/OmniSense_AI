@@ -60,7 +60,8 @@ docker compose up -d --build
 The app will listen on:
 
 ```text
-http://<vm-ip>:8501
+React dashboard: http://<vm-ip>:8501
+AI Streamlit:     http://<vm-ip>:8502
 ```
 
 MySQL is exposed to the host on:

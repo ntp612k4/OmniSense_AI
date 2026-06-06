@@ -48,8 +48,8 @@ docker compose up -d --build
 Open the apps:
 
 ```text
-React dashboard: http://localhost:5173
-AI Streamlit:     http://localhost:8501
+React dashboard: http://localhost:8501
+AI Streamlit:     http://localhost:8502
 MySQL:            127.0.0.1:3308
 ```
 
@@ -124,6 +124,8 @@ http://localhost:5174
 ```
 
 Or stop the old dev server and run again.
+
+When running with Docker, use `http://localhost:8501` for the main dashboard. Port `5173` is kept only for frontend development compatibility.
 
 ## Run AI Engine Locally
 
