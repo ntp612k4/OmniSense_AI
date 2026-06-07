@@ -267,6 +267,12 @@ h2 {
   font-weight: 800;
 }
 
+.export-button:disabled,
+.secondary-action:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
 .export-button:hover,
 .secondary-action:hover,
 .table-sort:hover,
@@ -545,6 +551,16 @@ td {
   padding: 1rem;
 }
 
+.test-form h3,
+.test-form p {
+  margin: 0;
+}
+
+.form-note {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .field-group {
   display: grid;
   gap: 0.5rem;
@@ -557,7 +573,8 @@ td {
 }
 
 .select-control,
-.test-input {
+.test-input,
+.file-input {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -585,6 +602,10 @@ td {
   gap: 1rem;
   min-height: 100%;
   padding: 1.1rem;
+}
+
+.result-panel-wide {
+  margin-top: 1rem;
 }
 
 .result-panel h3,
@@ -652,6 +673,20 @@ td {
   font-weight: 700;
 }
 
+.api-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 42px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 0 0.85rem;
+  color: var(--muted);
+  background: var(--panel-strong);
+  font-family: 'Fira Code', monospace;
+  font-size: 0.82rem;
+}
+
 .link-button:hover {
   border-color: var(--secondary);
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
@@ -705,6 +740,16 @@ td {
   padding: 1rem;
   color: var(--muted);
   border-top: 1px solid var(--border);
+}
+
+.error-banner {
+  margin-top: 1rem;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  color: var(--negative);
+  background: rgba(248, 113, 113, 0.12);
+  font-weight: 700;
 }
 
 .toast {

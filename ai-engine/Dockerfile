@@ -11,7 +11,8 @@ RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu 
     && pip install --no-cache-dir -r requirements.txt
 
 COPY ai-engine/app.py .
+COPY ai-engine/api.py .
 
 EXPOSE 8501
 
-CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8501"]

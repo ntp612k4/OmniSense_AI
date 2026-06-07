@@ -1,14 +1,14 @@
 import { BarChart3, Bell, Database, FlaskConical, Gauge, MessageSquareText, Settings, Workflow } from 'lucide-react';
 
 const navItems = [
-  { id: 'overview', label: 'Overview', icon: Gauge },
+  { id: 'overview', label: 'Tong quan', icon: Gauge },
   { id: 'test-lab', label: 'Test Lab', icon: FlaskConical },
-  { id: 'feedback', label: 'Feedback', icon: MessageSquareText },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-  { id: 'sources', label: 'Sources', icon: Database },
-  { id: 'automation', label: 'Automation', icon: Workflow },
-  { id: 'alerts', label: 'Alerts', icon: Bell },
-  { id: 'settings', label: 'Settings', icon: Settings },
+  { id: 'feedback', label: 'Phan hoi', icon: MessageSquareText },
+  { id: 'analytics', label: 'Phan tich', icon: BarChart3 },
+  { id: 'sources', label: 'Nguon du lieu', icon: Database },
+  { id: 'automation', label: 'Tu dong hoa', icon: Workflow },
+  { id: 'alerts', label: 'Canh bao', icon: Bell },
+  { id: 'settings', label: 'Cai dat', icon: Settings },
 ];
 
 export function Sidebar({ activeView, onViewChange }) {
@@ -18,7 +18,7 @@ export function Sidebar({ activeView, onViewChange }) {
         <div className="brand-mark" aria-hidden="true">OS</div>
         <div>
           <strong>OmniSense AI</strong>
-          <span>Sentiment analytics</span>
+          <span>Phan tich cam xuc</span>
         </div>
       </div>
       <nav className="nav-list">

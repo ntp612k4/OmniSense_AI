@@ -5,7 +5,8 @@ OmniSense AI is a full-stack SaaS project for AI-powered customer sentiment anal
 ## Features
 
 - React dashboard for SaaS analytics UI.
-- Streamlit AI engine for sentiment, domain, and language classification.
+- FastAPI AI engine for sentiment, domain, and language classification.
+- Test Lab in the React dashboard for one-review evaluation and CSV batch upload.
 - MySQL database service for analysis history.
 - Docker Compose setup for frontend, AI engine, and database.
 - Clean project structure for future backend API expansion.
@@ -15,7 +16,7 @@ OmniSense AI is a full-stack SaaS project for AI-powered customer sentiment anal
 | Layer | Technology |
 | --- | --- |
 | Frontend | React, Vite, lucide-react |
-| AI Engine | Python, Streamlit, PyTorch, Transformers |
+| AI Engine | Python, FastAPI, PyTorch, Transformers |
 | Database | MySQL 8 |
 | DevOps | Docker Compose |
 | Models | mBERT, XLM-RoBERTa, Multi-Task Learning model |
@@ -26,7 +27,7 @@ OmniSense AI is a full-stack SaaS project for AI-powered customer sentiment anal
 OmniSense_AI/
 |-- frontend/        React dashboard UI
 |-- backend/         API scaffold for SaaS services
-|-- ai-engine/       Streamlit/Python AI inference app
+|-- ai-engine/       FastAPI/Python AI inference service
 |-- database/        MySQL schema and database assets
 |-- design-system/   UI design system documentation
 |-- models/          Local model artifacts, ignored by Git
@@ -49,8 +50,8 @@ Open the apps:
 
 ```text
 React dashboard: http://localhost:8501
-AI Streamlit:     http://localhost:8502
-MySQL:            127.0.0.1:3308
+AI API:          http://localhost:8502/health
+MySQL:           127.0.0.1:3308
 ```
 
 Check running containers:
@@ -93,14 +94,14 @@ Password: omnisense_password
 Root password: root_password
 ```
 
-When the Streamlit app runs inside Docker, it connects to MySQL using:
+When the AI API runs inside Docker, it connects to MySQL using:
 
 ```text
 Host: mysql
 Port: 3306
 ```
 
-When the Streamlit app runs directly on Windows, use:
+When the AI API runs directly on Windows, use:
 
 ```text
 Host: 127.0.0.1
@@ -132,8 +133,10 @@ When running with Docker, use `http://localhost:8501` for the main dashboard. Po
 ```powershell
 cd D:\CD4_SAB
 pip install -r ai-engine\requirements.txt
-streamlit run ai-engine\app.py
+uvicorn api:app --app-dir ai-engine --host 0.0.0.0 --port 8502
 ```
+
+The old Streamlit prototype remains in `ai-engine/app.py`, but the Docker app uses `ai-engine/api.py` so the React Test Lab can call the real AI model from one dashboard.
 
 ## Git Notes
 

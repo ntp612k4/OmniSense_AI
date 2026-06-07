@@ -2,7 +2,7 @@
 
 ## Database choice
 
-For this project, use **MySQL Server** on the Ubuntu VM when moving beyond the Streamlit demo.
+For this project, use **MySQL Server** on the Ubuntu VM.
 
 - **MySQL Workbench** is only a desktop administration tool, not the database server.
 - **Firebase** is fast for realtime/mobile prototypes, but it is not a natural fit for self-hosting on a VM.
@@ -15,20 +15,21 @@ Starter schema: `database/schema_mysql.sql`.
 
 ## Current MVP state
 
-The current `ai-engine/app.py` is a Streamlit MVP:
+The Docker MVP now uses `ai-engine/api.py` as a FastAPI service:
 
 - Loads your existing MTL, XLM-RoBERTa and mBERT model folders.
-- Analyzes one review or a CSV batch.
-- Stores analysis history in local SQLite: `data/omnisense_ai.sqlite3`.
-- Shows sentiment, domain, language, alerts and recent analysis logs.
+- Receives one review through `POST /api/analyze`.
+- Receives CSV files through `POST /api/analyze-csv`.
+- Stores analysis history in MySQL.
+- Returns rows and metrics to the React dashboard Test Lab.
 
-SQLite is intentional for a local demo. Replace it with MySQL when you split the SaaS backend.
+The old Streamlit prototype remains in `ai-engine/app.py` for reference, but Docker runs the FastAPI service.
 
 ## Run locally
 
 ```bash
 pip install -r ai-engine/requirements.txt
-streamlit run ai-engine/app.py
+uvicorn api:app --app-dir ai-engine --host 0.0.0.0 --port 8502
 ```
 
 ## React dashboard
@@ -61,7 +62,7 @@ The app will listen on:
 
 ```text
 React dashboard: http://<vm-ip>:8501
-AI Streamlit:     http://<vm-ip>:8502
+AI API health:    http://<vm-ip>:8502/health
 ```
 
 MySQL is exposed to the host on:
@@ -87,13 +88,13 @@ docker compose logs -f frontend
 docker compose down
 ```
 
-For production, put Nginx in front of Streamlit and expose HTTPS on ports 80/443.
+For production, put Nginx in front of the React dashboard and API, then expose HTTPS on ports 80/443.
 
 ## Suggested SaaS architecture after MVP
 
 1. **AI Engine**
    - Python FastAPI + PyTorch.
-   - Endpoint: `POST /api/v1/analyze`.
+   - Endpoints: `POST /api/analyze`, `POST /api/analyze-csv`.
    - Returns sentiment, domain, language and confidence scores.
 
 2. **Backend API**

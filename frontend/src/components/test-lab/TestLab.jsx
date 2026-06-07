@@ -1,76 +1,112 @@
-import { CheckCircle2, ExternalLink, FlaskConical, Play, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+import { CheckCircle2, Database, FileUp, FlaskConical, Play, RotateCcw } from 'lucide-react';
 
-const negativeTerms = ['cham', 'loi', 'te', 'khong', 'hoan tien', 'delay', 'refund', 'bad', 'slow', 'error', 'unclear'];
-const positiveTerms = ['tot', 'hai long', 'nhanh', 'muot', 'great', 'good', 'smooth', 'fast', 'early', 'excellent'];
-const billingTerms = ['bill', 'billing', 'invoice', 'payment', 'refund', 'thanh toan', 'hoa don', 'hoan tien'];
-const serviceTerms = ['support', 'service', 'phan hoi', 'customer', 'agent', 'ticket'];
+const AI_API_BASE =
+  import.meta.env.VITE_AI_API_URL || `${window.location.protocol}//${window.location.hostname}:8502`;
 
-function detectLanguage(text) {
-  const normalized = text.toLowerCase();
-  if (/[ăâđêôơưáàảãạéèẻẽẹíìỉĩịóòỏõọúùủũụýỳỷỹỵ]/i.test(text) || normalized.includes('khach')) {
-    return 'Vietnamese';
+async function parseApiResponse(response) {
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload.detail || 'AI engine chua tra ve ket qua hop le.');
   }
-
-  return 'English';
+  return payload;
 }
 
-function scoreTerms(text, terms) {
-  return terms.reduce((score, term) => (text.includes(term) ? score + 1 : score), 0);
-}
+export function TestLab({ onEvaluationComplete, onBatchComplete, onNotify, latestEvaluation }) {
+  const [isSingleRunning, setIsSingleRunning] = useState(false);
+  const [isBatchRunning, setIsBatchRunning] = useState(false);
+  const [error, setError] = useState('');
 
-function evaluateReview(review, source) {
-  const text = review.toLowerCase();
-  const negativeScore = scoreTerms(text, negativeTerms);
-  const positiveScore = scoreTerms(text, positiveTerms);
-  const sentiment = negativeScore > positiveScore ? 'Negative' : positiveScore > negativeScore ? 'Positive' : 'Neutral';
-  const domain = scoreTerms(text, billingTerms) > 0 ? 'Billing' : scoreTerms(text, serviceTerms) > 0 ? 'Service' : 'Product';
-  const baseConfidence = sentiment === 'Neutral' ? 78 : 86;
-  const confidence = Math.min(98, baseConfidence + Math.abs(negativeScore - positiveScore) * 4 + Math.min(review.length, 120) / 10);
-
-  return {
-    id: `test-${Date.now()}`,
-    source,
-    review,
-    sentiment,
-    domain,
-    language: detectLanguage(review),
-    confidence: `${confidence.toFixed(1)}%`,
-    status: sentiment === 'Negative' ? 'Escalate' : sentiment === 'Neutral' ? 'Review' : 'Resolved',
-  };
-}
-
-export function TestLab({ onEvaluationComplete, latestEvaluation }) {
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const review = String(form.get('review') ?? '').trim();
     const source = String(form.get('source') ?? 'Manual Test');
 
     if (!review) {
+      setError('Nhap noi dung review truoc khi danh gia.');
       return;
     }
 
-    onEvaluationComplete(evaluateReview(review, source));
-    event.currentTarget.reset();
+    setError('');
+    setIsSingleRunning(true);
+    try {
+      const payload = await parseApiResponse(
+        await fetch(`${AI_API_BASE}/api/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: review,
+            source,
+            workspace: 'Demo Retail VN',
+            model_name: 'MTL - Multi-Task Learning',
+          }),
+        }),
+      );
+      onEvaluationComplete(payload.row);
+      onNotify('Da phan tich bang AI that va them vao bang.');
+      event.currentTarget.reset();
+    } catch (exc) {
+      setError(exc.message);
+    } finally {
+      setIsSingleRunning(false);
+    }
+  }
+
+  async function handleCsvSubmit(event) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const file = form.get('csv');
+
+    if (!(file instanceof File) || file.size === 0) {
+      setError('Chon file CSV truoc khi phan tich batch.');
+      return;
+    }
+
+    setError('');
+    setIsBatchRunning(true);
+    const body = new FormData();
+    body.append('file', file);
+    body.append('source', String(form.get('batchSource') ?? 'CSV Upload'));
+    body.append('workspace', 'Demo Retail VN');
+    body.append('model_name', 'MTL - Multi-Task Learning');
+    body.append('max_rows', String(form.get('maxRows') ?? '100'));
+
+    try {
+      const payload = await parseApiResponse(
+        await fetch(`${AI_API_BASE}/api/analyze-csv`, {
+          method: 'POST',
+          body,
+        }),
+      );
+      onBatchComplete(payload.rows);
+      onNotify(`Da phan tich ${payload.rows.length} dong CSV va cap nhat dashboard.`);
+      event.currentTarget.reset();
+    } catch (exc) {
+      setError(exc.message);
+    } finally {
+      setIsBatchRunning(false);
+    }
   }
 
   return (
     <section className="workspace-panel glass-panel" aria-labelledby="test-lab-title">
       <div className="panel-heading">
         <div>
-          <p className="section-kicker">Evaluation workspace</p>
+          <p className="section-kicker">Kiem thu AI that</p>
           <h2 id="test-lab-title">Test Lab</h2>
         </div>
-        <a className="link-button cursor-pointer" href="http://localhost:8502" target="_blank" rel="noreferrer">
-          <ExternalLink aria-hidden="true" size={16} />
-          Open AI Engine
-        </a>
+        <div className="api-pill">
+          <Database aria-hidden="true" size={16} />
+          AI API: {AI_API_BASE.replace(/^https?:\/\//, '')}
+        </div>
       </div>
 
       <div className="test-lab-grid">
         <form className="test-form" onSubmit={handleSubmit}>
+          <h3>Danh gia mot phan hoi</h3>
           <label className="field-group">
-            <span>Source</span>
+            <span>Nguon</span>
             <select className="select-control cursor-pointer" name="source" defaultValue="Manual Test">
               <option>Manual Test</option>
               <option>Facebook</option>
@@ -81,60 +117,92 @@ export function TestLab({ onEvaluationComplete, latestEvaluation }) {
           </label>
 
           <label className="field-group">
-            <span>Review text</span>
+            <span>Noi dung review</span>
             <textarea
               className="test-input"
               name="review"
               rows="8"
-              placeholder="Example: Khach hang phan nan vi thanh toan loi va cham hoan tien."
+              placeholder="Vi du: Khach hang phan nan vi thanh toan loi va cham hoan tien."
             />
           </label>
 
           <div className="action-row">
-            <button className="export-button cursor-pointer" type="submit">
+            <button className="export-button cursor-pointer" type="submit" disabled={isSingleRunning}>
               <Play aria-hidden="true" size={17} />
-              Run evaluation
+              {isSingleRunning ? 'Dang phan tich' : 'Chay danh gia AI'}
             </button>
             <button className="secondary-action cursor-pointer" type="reset">
               <RotateCcw aria-hidden="true" size={17} />
-              Clear
+              Xoa
             </button>
           </div>
         </form>
 
-        <div className="result-panel">
-          <div className="result-icon" aria-hidden="true">
-            {latestEvaluation ? <CheckCircle2 size={24} /> : <FlaskConical size={24} />}
-          </div>
-          <h3>{latestEvaluation ? 'Latest result' : 'Ready for evaluation'}</h3>
+        <form className="test-form" onSubmit={handleCsvSubmit}>
+          <h3>Upload CSV de ve bieu do</h3>
+          <p className="form-note">
+            CSV can co mot cot ten review, text, content, comment, feedback hoac message.
+          </p>
+          <label className="field-group">
+            <span>Tep CSV</span>
+            <input className="file-input cursor-pointer" type="file" name="csv" accept=".csv,text/csv" />
+          </label>
+          <label className="field-group">
+            <span>Nguon batch</span>
+            <select className="select-control cursor-pointer" name="batchSource" defaultValue="CSV Upload">
+              <option>CSV Upload</option>
+              <option>Facebook</option>
+              <option>App Store</option>
+              <option>Email</option>
+            </select>
+          </label>
+          <label className="field-group">
+            <span>So dong xu ly toi da</span>
+            <input className="select-control" type="number" name="maxRows" min="1" max="500" defaultValue="100" />
+          </label>
+          <button className="export-button cursor-pointer" type="submit" disabled={isBatchRunning}>
+            <FileUp aria-hidden="true" size={17} />
+            {isBatchRunning ? 'Dang xu ly CSV' : 'Phan tich file CSV'}
+          </button>
+        </form>
+      </div>
+
+      <div className="result-panel result-panel-wide">
+        <div className="result-icon" aria-hidden="true">
+          {latestEvaluation ? <CheckCircle2 size={24} /> : <FlaskConical size={24} />}
+        </div>
+        <div>
+          <h3>{latestEvaluation ? 'Ket qua gan nhat' : 'San sang danh gia'}</h3>
           <p>
             {latestEvaluation
-              ? 'The tested review was added to the feedback table and can be exported.'
-              : 'Use this area to test classification UX before connecting the production model API.'}
+              ? 'Ket qua duoc tra ve tu AI engine that, da them vao bang va co the export CSV.'
+              : 'Nguoi dung co the test mot review hoac upload CSV de cap nhat KPI, bieu do va bang.'}
           </p>
-
-          {latestEvaluation && (
-            <div className="result-grid">
-              <div>
-                <span>Sentiment</span>
-                <strong>{latestEvaluation.sentiment}</strong>
-              </div>
-              <div>
-                <span>Domain</span>
-                <strong>{latestEvaluation.domain}</strong>
-              </div>
-              <div>
-                <span>Language</span>
-                <strong>{latestEvaluation.language}</strong>
-              </div>
-              <div>
-                <span>Confidence</span>
-                <strong>{latestEvaluation.confidence}</strong>
-              </div>
-            </div>
-          )}
         </div>
+
+        {latestEvaluation && (
+          <div className="result-grid">
+            <div>
+              <span>Cam xuc</span>
+              <strong>{latestEvaluation.sentiment}</strong>
+            </div>
+            <div>
+              <span>Linh vuc</span>
+              <strong>{latestEvaluation.domain}</strong>
+            </div>
+            <div>
+              <span>Ngon ngu</span>
+              <strong>{latestEvaluation.language}</strong>
+            </div>
+            <div>
+              <span>Do tin cay</span>
+              <strong>{latestEvaluation.confidence}</strong>
+            </div>
+          </div>
+        )}
       </div>
+
+      {error && <div className="error-banner">{error}</div>}
     </section>
   );
 }
