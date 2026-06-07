@@ -1,16 +1,17 @@
-import { BarChart3, Bell, Database, Gauge, MessageSquareText, Settings, Workflow } from 'lucide-react';
+import { BarChart3, Bell, Database, FlaskConical, Gauge, MessageSquareText, Settings, Workflow } from 'lucide-react';
 
 const navItems = [
-  { label: 'Overview', icon: Gauge, active: true },
-  { label: 'Feedback', icon: MessageSquareText },
-  { label: 'Analytics', icon: BarChart3 },
-  { label: 'Sources', icon: Database },
-  { label: 'Automation', icon: Workflow },
-  { label: 'Alerts', icon: Bell },
-  { label: 'Settings', icon: Settings },
+  { id: 'overview', label: 'Overview', icon: Gauge },
+  { id: 'test-lab', label: 'Test Lab', icon: FlaskConical },
+  { id: 'feedback', label: 'Feedback', icon: MessageSquareText },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+  { id: 'sources', label: 'Sources', icon: Database },
+  { id: 'automation', label: 'Automation', icon: Workflow },
+  { id: 'alerts', label: 'Alerts', icon: Bell },
+  { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
-export function Sidebar() {
+export function Sidebar({ activeView, onViewChange }) {
   return (
     <aside className="sidebar glass-panel" aria-label="Primary navigation">
       <div className="brand-lockup">
@@ -23,12 +24,14 @@ export function Sidebar() {
       <nav className="nav-list">
         {navItems.map((item) => {
           const Icon = item.icon;
+          const isActive = activeView === item.id;
           return (
             <button
-              className={`nav-item cursor-pointer ${item.active ? 'active' : ''}`}
+              className={`nav-item cursor-pointer ${isActive ? 'active' : ''}`}
               type="button"
               key={item.label}
-              aria-current={item.active ? 'page' : undefined}
+              aria-current={isActive ? 'page' : undefined}
+              onClick={() => onViewChange(item.id)}
             >
               <Icon aria-hidden="true" size={18} />
               <span>{item.label}</span>

@@ -41,7 +41,9 @@ export const sentimentTrend = [
 
 export const feedbackRows = [
   {
+    id: 'fb-001',
     source: 'Facebook',
+    review: 'Khach phan nan phan hoi cham va chua co xac nhan hoan tien.',
     sentiment: 'Negative',
     domain: 'Service',
     language: 'Vietnamese',
@@ -49,7 +51,9 @@ export const feedbackRows = [
     status: 'Escalate',
   },
   {
+    id: 'app-002',
     source: 'App Store',
+    review: 'The latest update is smooth and the dashboard loads faster.',
     sentiment: 'Positive',
     domain: 'Product',
     language: 'English',
@@ -57,7 +61,9 @@ export const feedbackRows = [
     status: 'Resolved',
   },
   {
+    id: 'mail-003',
     source: 'Email',
+    review: 'Customer asked for invoice details and next support steps.',
     sentiment: 'Neutral',
     domain: 'Support',
     language: 'French',
@@ -65,7 +71,9 @@ export const feedbackRows = [
     status: 'Review',
   },
   {
+    id: 'csv-004',
     source: 'CSV Upload',
+    review: 'Refund confirmation was delayed and the billing flow was unclear.',
     sentiment: 'Negative',
     domain: 'Billing',
     language: 'German',
@@ -73,7 +81,9 @@ export const feedbackRows = [
     status: 'Escalate',
   },
   {
+    id: 'amz-005',
     source: 'Amazon',
+    review: 'Delivery arrived early and the product quality matched expectations.',
     sentiment: 'Positive',
     domain: 'Delivery',
     language: 'English',
