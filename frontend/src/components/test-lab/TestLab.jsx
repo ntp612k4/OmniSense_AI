@@ -7,7 +7,7 @@ const AI_API_BASE =
 async function parseApiResponse(response) {
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(payload.detail || 'AI engine chua tra ve ket qua hop le.');
+    throw new Error(payload.detail || 'The AI engine returned an invalid response.');
   }
   return payload;
 }
@@ -24,7 +24,7 @@ export function TestLab({ onEvaluationComplete, onBatchComplete, onNotify, lates
     const source = String(form.get('source') ?? 'Manual Test');
 
     if (!review) {
-      setError('Nhap noi dung review truoc khi danh gia.');
+      setError('Enter review text before running an evaluation.');
       return;
     }
 
@@ -44,7 +44,7 @@ export function TestLab({ onEvaluationComplete, onBatchComplete, onNotify, lates
         }),
       );
       onEvaluationComplete(payload.row);
-      onNotify('Da phan tich bang AI that va them vao bang.');
+      onNotify('The real AI engine analyzed the review and added it to the table.');
       event.currentTarget.reset();
     } catch (exc) {
       setError(exc.message);
@@ -59,7 +59,7 @@ export function TestLab({ onEvaluationComplete, onBatchComplete, onNotify, lates
     const file = form.get('csv');
 
     if (!(file instanceof File) || file.size === 0) {
-      setError('Chon file CSV truoc khi phan tich batch.');
+      setError('Choose a CSV file before running batch analysis.');
       return;
     }
 
@@ -80,7 +80,7 @@ export function TestLab({ onEvaluationComplete, onBatchComplete, onNotify, lates
         }),
       );
       onBatchComplete(payload.rows);
-      onNotify(`Da phan tich ${payload.rows.length} dong CSV va cap nhat dashboard.`);
+      onNotify(`Analyzed ${payload.rows.length} CSV rows and updated the dashboard.`);
       event.currentTarget.reset();
     } catch (exc) {
       setError(exc.message);
@@ -93,7 +93,7 @@ export function TestLab({ onEvaluationComplete, onBatchComplete, onNotify, lates
     <section className="workspace-panel glass-panel" aria-labelledby="test-lab-title">
       <div className="panel-heading">
         <div>
-          <p className="section-kicker">Kiem thu AI that</p>
+          <p className="section-kicker">Real AI evaluation</p>
           <h2 id="test-lab-title">Test Lab</h2>
         </div>
         <div className="api-pill">
@@ -104,9 +104,9 @@ export function TestLab({ onEvaluationComplete, onBatchComplete, onNotify, lates
 
       <div className="test-lab-grid">
         <form className="test-form" onSubmit={handleSubmit}>
-          <h3>Danh gia mot phan hoi</h3>
+          <h3>Evaluate one review</h3>
           <label className="field-group">
-            <span>Nguon</span>
+            <span>Source</span>
             <select className="select-control cursor-pointer" name="source" defaultValue="Manual Test">
               <option>Manual Test</option>
               <option>Facebook</option>
@@ -117,38 +117,38 @@ export function TestLab({ onEvaluationComplete, onBatchComplete, onNotify, lates
           </label>
 
           <label className="field-group">
-            <span>Noi dung review</span>
+            <span>Review text</span>
             <textarea
               className="test-input"
               name="review"
               rows="8"
-              placeholder="Vi du: Khach hang phan nan vi thanh toan loi va cham hoan tien."
+              placeholder="Example: The customer complained about payment errors and a delayed refund."
             />
           </label>
 
           <div className="action-row">
             <button className="export-button cursor-pointer" type="submit" disabled={isSingleRunning}>
               <Play aria-hidden="true" size={17} />
-              {isSingleRunning ? 'Dang phan tich' : 'Chay danh gia AI'}
+              {isSingleRunning ? 'Analyzing' : 'Run AI evaluation'}
             </button>
             <button className="secondary-action cursor-pointer" type="reset">
               <RotateCcw aria-hidden="true" size={17} />
-              Xoa
+              Clear
             </button>
           </div>
         </form>
 
         <form className="test-form" onSubmit={handleCsvSubmit}>
-          <h3>Upload CSV de ve bieu do</h3>
+          <h3>Upload CSV for charting</h3>
           <p className="form-note">
-            CSV can co mot cot ten review, text, content, comment, feedback hoac message.
+            The CSV must include one text column named review, text, content, comment, feedback, or message.
           </p>
           <label className="field-group">
-            <span>Tep CSV</span>
+            <span>CSV file</span>
             <input className="file-input cursor-pointer" type="file" name="csv" accept=".csv,text/csv" />
           </label>
           <label className="field-group">
-            <span>Nguon batch</span>
+            <span>Batch source</span>
             <select className="select-control cursor-pointer" name="batchSource" defaultValue="CSV Upload">
               <option>CSV Upload</option>
               <option>Facebook</option>
@@ -157,12 +157,12 @@ export function TestLab({ onEvaluationComplete, onBatchComplete, onNotify, lates
             </select>
           </label>
           <label className="field-group">
-            <span>So dong xu ly toi da</span>
+            <span>Maximum rows to process</span>
             <input className="select-control" type="number" name="maxRows" min="1" max="500" defaultValue="100" />
           </label>
           <button className="export-button cursor-pointer" type="submit" disabled={isBatchRunning}>
             <FileUp aria-hidden="true" size={17} />
-            {isBatchRunning ? 'Dang xu ly CSV' : 'Phan tich file CSV'}
+            {isBatchRunning ? 'Processing CSV' : 'Analyze CSV file'}
           </button>
         </form>
       </div>
@@ -172,30 +172,30 @@ export function TestLab({ onEvaluationComplete, onBatchComplete, onNotify, lates
           {latestEvaluation ? <CheckCircle2 size={24} /> : <FlaskConical size={24} />}
         </div>
         <div>
-          <h3>{latestEvaluation ? 'Ket qua gan nhat' : 'San sang danh gia'}</h3>
+          <h3>{latestEvaluation ? 'Latest result' : 'Ready for evaluation'}</h3>
           <p>
             {latestEvaluation
-              ? 'Ket qua duoc tra ve tu AI engine that, da them vao bang va co the export CSV.'
-              : 'Nguoi dung co the test mot review hoac upload CSV de cap nhat KPI, bieu do va bang.'}
+              ? 'The result came from the real AI engine, was added to the table, and can be exported as CSV.'
+              : 'Users can test one review or upload a CSV to update KPIs, charts, and the table.'}
           </p>
         </div>
 
         {latestEvaluation && (
           <div className="result-grid">
             <div>
-              <span>Cam xuc</span>
+              <span>Sentiment</span>
               <strong>{latestEvaluation.sentiment}</strong>
             </div>
             <div>
-              <span>Linh vuc</span>
+              <span>Domain</span>
               <strong>{latestEvaluation.domain}</strong>
             </div>
             <div>
-              <span>Ngon ngu</span>
+              <span>Language</span>
               <strong>{latestEvaluation.language}</strong>
             </div>
             <div>
-              <span>Do tin cay</span>
+              <span>Confidence</span>
               <strong>{latestEvaluation.confidence}</strong>
             </div>
           </div>

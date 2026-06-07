@@ -5,23 +5,11 @@ function sentimentClass(sentiment) {
 }
 
 function sentimentLabel(sentiment) {
-  if (sentiment === 'Positive') {
-    return 'Tich cuc';
-  }
-  if (sentiment === 'Negative') {
-    return 'Tieu cuc';
-  }
-  return 'Trung tinh';
+  return sentiment;
 }
 
 function statusLabel(status) {
-  if (status === 'Escalate') {
-    return 'Can xu ly';
-  }
-  if (status === 'Resolved') {
-    return 'On dinh';
-  }
-  return 'Theo doi';
+  return status;
 }
 
 export function DataTable({ rows, onSort, sortDirection = 'desc' }) {
@@ -29,25 +17,25 @@ export function DataTable({ rows, onSort, sortDirection = 'desc' }) {
     <section className="table-panel glass-panel" aria-labelledby="table-title">
       <div className="panel-heading">
         <div>
-          <p className="section-kicker">Ket qua moi nhat</p>
-          <h2 id="table-title">Bang phan loai phan hoi</h2>
+          <p className="section-kicker">Latest analysis</p>
+          <h2 id="table-title">Feedback classification</h2>
         </div>
         <button className="table-sort cursor-pointer" type="button" onClick={onSort}>
           <ArrowUpDown aria-hidden="true" size={16} />
-          Sap xep {sortDirection === 'desc' ? 'cao' : 'thap'}
+          Sort {sortDirection === 'desc' ? 'high' : 'low'}
         </button>
       </div>
       <div className="table-scroll">
         <table>
           <thead>
             <tr>
-              <th>Nguon</th>
-              <th>Noi dung</th>
-              <th>Cam xuc</th>
-              <th>Linh vuc</th>
-              <th>Ngon ngu</th>
-              <th>Do tin cay</th>
-              <th>Trang thai</th>
+              <th>Source</th>
+              <th>Review</th>
+              <th>Sentiment</th>
+              <th>Domain</th>
+              <th>Language</th>
+              <th>Confidence</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -66,7 +54,7 @@ export function DataTable({ rows, onSort, sortDirection = 'desc' }) {
         </table>
         {rows.length === 0 && (
           <div className="empty-state">
-            Khong tim thay phan hoi phu hop. Hay doi tu khoa hoac them du lieu trong Test Lab.
+            No matching feedback found. Try another keyword or add new data in Test Lab.
           </div>
         )}
       </div>

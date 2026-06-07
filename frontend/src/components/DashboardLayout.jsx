@@ -19,52 +19,52 @@ import { feedbackRows } from '../data/dashboardData.js';
 
 const viewCopy = {
   overview: {
-    kicker: 'Tri tue khach hang',
+    kicker: 'Customer intelligence',
     title: 'OmniSense AI Dashboard',
-    subtitle: 'Theo doi cam xuc khach hang, suc khoe kenh du lieu va chat luong phan tich AI trong mot workspace.',
+    subtitle: 'Monitor customer sentiment, channel health, and AI analysis quality in one workspace.',
   },
   'test-lab': {
-    kicker: 'Kiem thu danh gia',
+    kicker: 'Evaluation workspace',
     title: 'Test Lab',
-    subtitle: 'Nhap mot review hoac upload CSV de AI that phan tich va cap nhat dashboard.',
+    subtitle: 'Enter one review or upload a CSV so the real AI engine can analyze it and update the dashboard.',
   },
   feedback: {
-    kicker: 'Phan hoi khach hang',
-    title: 'Hang doi phan hoi',
-    subtitle: 'Xem ket qua phan loai, tim kiem theo kenh, cam xuc, linh vuc hoac trang thai.',
+    kicker: 'Customer feedback',
+    title: 'Feedback Queue',
+    subtitle: 'Review classification results and search by channel, sentiment, domain, or status.',
   },
   analytics: {
-    kicker: 'Phan tich cam xuc',
-    title: 'Bieu do phan tich',
-    subtitle: 'Bieu do duoc cap nhat theo du lieu that vua nhap hoac upload tu CSV.',
+    kicker: 'Sentiment analytics',
+    title: 'Analytics View',
+    subtitle: 'Charts update from the real data you enter manually or upload from CSV.',
   },
   sources: {
-    kicker: 'Nguon du lieu',
-    title: 'Ket noi du lieu',
-    subtitle: 'Theo doi cac nguon review va tinh trang nap du lieu vao he thong.',
+    kicker: 'Data sources',
+    title: 'Source Connections',
+    subtitle: 'Monitor review sources and ingestion readiness across the system.',
   },
   automation: {
-    kicker: 'Tu dong hoa',
-    title: 'Quy tac xu ly',
-    subtitle: 'Dinh tuyen phan hoi tieu cuc, tao canh bao va giu quy trinh theo doi nhat quan.',
+    kicker: 'Automation',
+    title: 'Workflow Rules',
+    subtitle: 'Route negative feedback, create alerts, and keep follow-up workflows consistent.',
   },
   alerts: {
-    kicker: 'Chinh sach canh bao',
-    title: 'Trung tam canh bao',
-    subtitle: 'Dieu chinh nguong leo thang cho cam xuc tieu cuc va ket qua co do tin cay thap.',
+    kicker: 'Alert policy',
+    title: 'Alert Center',
+    subtitle: 'Tune escalation thresholds for negative sentiment and low-confidence analysis.',
   },
   settings: {
-    kicker: 'Cai dat workspace',
-    title: 'Cai dat',
-    subtitle: 'Cau hinh database, model AI va tuy chon van hanh workspace.',
+    kicker: 'Workspace settings',
+    title: 'Settings',
+    subtitle: 'Configure database, AI model, and workspace operation preferences.',
   },
 };
 
 const sourceCards = [
-  { name: 'Facebook', status: 'Da ket noi', volume: '9,420 reviews' },
-  { name: 'CSV Upload', status: 'San sang', volume: 'Nhap file thu cong' },
-  { name: 'Email', status: 'Da ket noi', volume: '2,140 messages' },
-  { name: 'App Store', status: 'Dang cho', volume: 'Cho dong bo API' },
+  { name: 'Facebook', status: 'Connected', volume: '9,420 reviews' },
+  { name: 'CSV Upload', status: 'Ready', volume: 'Manual file import' },
+  { name: 'Email', status: 'Connected', volume: '2,140 messages' },
+  { name: 'App Store', status: 'Queued', volume: 'Waiting for API sync' },
 ];
 
 function percentNumber(value) {
@@ -91,7 +91,7 @@ function normalizeRow(row) {
 
 function buildCsv(rows) {
   const headers = ['source', 'review', 'sentiment', 'domain', 'language', 'confidence', 'status'];
-  const labels = ['Nguon', 'Noi dung', 'Cam xuc', 'Linh vuc', 'Ngon ngu', 'Do tin cay', 'Trang thai'];
+  const labels = ['Source', 'Review', 'Sentiment', 'Domain', 'Language', 'Confidence', 'Status'];
   const lines = rows.map((row) =>
     headers
       .map((key) => `"${String(row[key] ?? '').replaceAll('"', '""')}"`)
@@ -124,32 +124,32 @@ function buildKpis(rows) {
   const metrics = summarizeRows(rows);
   return [
     {
-      label: 'Tong phan hoi',
+      label: 'Total feedback',
       value: metrics.total.toLocaleString('en-US'),
-      delta: `${metrics.total} dong`,
+      delta: `${metrics.total} rows`,
       tone: 'blue',
-      description: 'Dang hien thi trong workspace',
+      description: 'Currently shown in this workspace',
     },
     {
-      label: 'Ty le tieu cuc',
+      label: 'Negative rate',
       value: `${metrics.negativeRate.toFixed(1)}%`,
-      delta: `${metrics.negative} can xu ly`,
+      delta: `${metrics.negative} priority`,
       tone: 'red',
-      description: 'Uu tien theo doi',
+      description: 'Needs follow-up',
     },
     {
-      label: 'Ty le trung tinh',
+      label: 'Neutral rate',
       value: `${metrics.neutralRate.toFixed(1)}%`,
-      delta: `${metrics.neutral} can quan sat`,
+      delta: `${metrics.neutral} to monitor`,
       tone: 'slate',
-      description: 'Co the can follow-up',
+      description: 'May need follow-up',
     },
     {
-      label: 'Do tin cay AI',
+      label: 'AI confidence',
       value: `${metrics.confidence.toFixed(1)}%`,
-      delta: `${metrics.positive} tich cuc`,
+      delta: `${metrics.positive} positive`,
       tone: 'amber',
-      description: 'Trung binh confidence',
+      description: 'Average confidence',
     },
   ];
 }
@@ -208,7 +208,7 @@ export function DashboardLayout() {
     link.download = 'omnisense-feedback-report.csv';
     link.click();
     URL.revokeObjectURL(url);
-    showToast('Da export bao cao CSV.');
+    showToast('Report exported as CSV.');
   }
 
   function handleEvaluationComplete(result) {
@@ -232,8 +232,8 @@ export function DashboardLayout() {
         <section className="workspace-panel glass-panel">
           <div className="panel-heading">
             <div>
-              <p className="section-kicker">Kenh du lieu</p>
-              <h2>Tinh trang ket noi</h2>
+              <p className="section-kicker">Data channels</p>
+              <h2>Connection status</h2>
             </div>
           </div>
           <div className="source-grid">
@@ -260,15 +260,15 @@ export function DashboardLayout() {
           </div>
           <div className="settings-grid">
             <label className="toggle-row">
-              <span>Tu dong dua phan hoi tieu cuc vao hang xu ly</span>
+              <span>Automatically route negative feedback to the review queue</span>
               <input className="cursor-pointer" type="checkbox" defaultChecked />
             </label>
             <label className="toggle-row">
-              <span>Yeu cau do tin cay tren 80%</span>
+              <span>Require confidence above 80%</span>
               <input className="cursor-pointer" type="checkbox" defaultChecked />
             </label>
             <label className="toggle-row">
-              <span>Luu ket qua vao MySQL</span>
+              <span>Save results to MySQL</span>
               <input className="cursor-pointer" type="checkbox" defaultChecked />
             </label>
           </div>
@@ -304,11 +304,11 @@ export function DashboardLayout() {
           <ChartPanel rows={rows} />
           <aside className="insight-panel glass-panel">
             <div>
-              <p className="section-kicker">Nhan dinh AI</p>
-              <h2>Phan hoi trung tinh can duoc theo doi som.</h2>
+              <p className="section-kicker">AI insight</p>
+              <h2>Neutral feedback should be monitored early.</h2>
               <p>
-                Nhom trung tinh thuong la khach hang dang cho cau tra loi. Nen dua vao hang follow-up de tranh chuyen
-                thanh trai nghiem tieu cuc.
+                Neutral feedback often means the customer is waiting for a clear answer. Route these reviews to a
+                follow-up queue before they become negative.
               </p>
             </div>
           </aside>
@@ -325,19 +325,19 @@ export function DashboardLayout() {
         <section className="status-grid" aria-label="System status">
           <div className="status-item glass-panel">
             <BrainCircuit aria-hidden="true" size={20} />
-            <span>Model MTL dang san sang</span>
+            <span>MTL model ready</span>
           </div>
           <div className="status-item glass-panel">
             <Database aria-hidden="true" size={20} />
-            <span>Dong bo MySQL san sang</span>
+            <span>MySQL sync ready</span>
           </div>
           <div className="status-item glass-panel">
             <ShieldCheck aria-hidden="true" size={20} />
-            <span>Du lieu duoc kiem tra</span>
+            <span>Data quality checked</span>
           </div>
           <div className="status-item glass-panel">
             <BarChart3 aria-hidden="true" size={20} />
-            <span>Bieu do cap nhat theo file</span>
+            <span>Charts update from files</span>
           </div>
         </section>
 
@@ -351,11 +351,11 @@ export function DashboardLayout() {
           <ChartPanel rows={rows} />
           <aside className="insight-panel glass-panel">
             <div>
-              <p className="section-kicker">Nhan dinh AI</p>
-              <h2>Du lieu upload se cap nhat bieu do ngay trong dashboard.</h2>
+              <p className="section-kicker">AI insight</p>
+              <h2>Uploaded data updates charts directly in the dashboard.</h2>
               <p>
-                Vao Test Lab, upload CSV co cot review hoac text. He thong goi AI engine that, luu MySQL va ve lai KPI,
-                bieu do, bang theo du lieu cua ban.
+                Go to Test Lab and upload a CSV with a review or text column. The system calls the real AI engine,
+                saves results to MySQL, and redraws KPIs, charts, and tables from your data.
               </p>
             </div>
             <button
@@ -364,7 +364,7 @@ export function DashboardLayout() {
               onClick={() => setAlertPanelOpen((value) => !value)}
             >
               <Settings aria-hidden="true" size={17} />
-              Chinh canh bao
+              Tune alerts
             </button>
           </aside>
         </section>
@@ -373,8 +373,8 @@ export function DashboardLayout() {
           <section className="alert-panel glass-panel" aria-live="polite">
             <CheckCircle2 aria-hidden="true" size={20} />
             <div>
-              <strong>Quy tac canh bao da san sang</strong>
-              <p>Ty le tieu cuc tren 12% hoac do tin cay duoi 80% se tao tac vu can xu ly.</p>
+              <strong>Alert rules are ready</strong>
+              <p>Negative sentiment above 12% or confidence below 80% will create a review task.</p>
             </div>
           </section>
         )}
@@ -400,7 +400,7 @@ export function DashboardLayout() {
               <input
                 id="dashboard-search"
                 type="search"
-                placeholder="Tim phan hoi"
+                placeholder="Search feedback"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
@@ -408,7 +408,7 @@ export function DashboardLayout() {
             <ThemeToggle />
             <button className="export-button cursor-pointer" type="button" onClick={handleExport}>
               <FileDown aria-hidden="true" size={18} />
-              Export bao cao
+              Export Report
             </button>
           </div>
         </header>

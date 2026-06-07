@@ -2,7 +2,7 @@ const maxValue = 100;
 
 function buildTrend(rows = []) {
   const groups = rows.reduce((acc, row) => {
-    const label = row.source || 'Khac';
+    const label = row.source || 'Other';
     if (!acc[label]) {
       acc[label] = { label, positive: 0, neutral: 0, negative: 0 };
     }
@@ -36,13 +36,13 @@ export function ChartPanel({ rows = [] }) {
     <section className="chart-panel glass-panel" aria-labelledby="trend-title">
       <div className="panel-heading">
         <div>
-          <p className="section-kicker">Bieu do cam xuc</p>
-          <h2 id="trend-title">Ty le cam xuc theo nguon</h2>
+          <p className="section-kicker">Sentiment chart</p>
+          <h2 id="trend-title">Sentiment mix by source</h2>
         </div>
         <div className="chart-legend" aria-label="Chart legend">
-          <span><i className="legend-positive" />Tich cuc</span>
-          <span><i className="legend-neutral" />Trung tinh</span>
-          <span><i className="legend-negative" />Tieu cuc</span>
+          <span><i className="legend-positive" />Positive</span>
+          <span><i className="legend-neutral" />Neutral</span>
+          <span><i className="legend-negative" />Negative</span>
         </div>
       </div>
       <div className="bar-chart" role="img" aria-label="Stacked sentiment bar chart for the last seven days">
