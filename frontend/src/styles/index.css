@@ -176,6 +176,8 @@ textarea:focus-visible {
 .main-panel {
   display: grid;
   gap: 1rem;
+  align-content: start;
+  grid-auto-rows: max-content;
   min-width: 0;
 }
 
@@ -528,6 +530,7 @@ td {
 .alert-panel {
   border-radius: 18px;
   padding: 1.2rem;
+  min-height: 0;
 }
 
 .test-lab-grid {
@@ -539,7 +542,8 @@ td {
 .test-form,
 .result-panel,
 .settings-grid,
-.source-card {
+.source-card,
+.management-card {
   border: 1px solid var(--border);
   border-radius: 16px;
   background: var(--panel-strong);
@@ -701,12 +705,192 @@ td {
 }
 
 .source-card p {
-  margin: 0.6rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.7rem 0 0;
   color: var(--muted);
+}
+
+.source-header,
+.card-actions,
+.api-health-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  box-shadow: 0 0 0 5px rgba(148, 163, 184, 0.12);
+}
+
+.status-dot.online {
+  background: var(--positive);
+}
+
+.status-dot.offline {
+  background: var(--negative);
+}
+
+.mini-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin-top: 0.9rem;
+}
+
+.mini-metrics div {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.75rem;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.mini-metrics small,
+.management-note,
+.alert-item small {
+  display: block;
+  color: var(--muted);
+}
+
+.mini-metrics b {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 1rem;
+}
+
+.card-actions {
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  justify-content: flex-start;
+}
+
+.compact-action {
+  min-height: 38px;
+  border-radius: 12px;
+  padding: 0 0.75rem;
+  font-size: 0.9rem;
 }
 
 .settings-grid {
   padding: 1rem;
+}
+
+.management-grid,
+.settings-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: 1rem;
+}
+
+.management-card {
+  padding: 1rem;
+}
+
+.management-card h2 {
+  margin-bottom: 1rem;
+}
+
+.range-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.range-row label {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.range-row input {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: var(--cta);
+}
+
+.alert-summary {
+  margin: 0 0 1rem;
+}
+
+.alert-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.alert-item {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem;
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.alert-item.resolved {
+  opacity: 0.66;
+}
+
+.alert-item p {
+  margin: 0.25rem 0 0.35rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.alert-severity {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  border-radius: 13px;
+  padding: 0 0.8rem;
+  font-weight: 800;
+}
+
+.alert-severity.high {
+  color: #7f1d1d;
+  background: rgba(248, 113, 113, 0.18);
+}
+
+.alert-severity.medium {
+  color: #78350f;
+  background: rgba(245, 158, 11, 0.18);
+}
+
+.field-row {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.field-row span,
+.api-health-card span {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.field-row input,
+.field-row select {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--text);
+  padding: 0 0.9rem;
+}
+
+.settings-form .api-health-card {
+  grid-column: 1 / -1;
 }
 
 .toggle-row {
@@ -780,7 +964,9 @@ td {
   .kpi-grid,
   .content-grid,
   .test-lab-grid,
-  .source-grid {
+  .source-grid,
+  .management-grid,
+  .settings-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -808,7 +994,11 @@ td {
   .nav-list,
   .test-lab-grid,
   .source-grid,
-  .result-grid {
+  .result-grid,
+  .management-grid,
+  .settings-form,
+  .mini-metrics,
+  .alert-item {
     grid-template-columns: 1fr;
   }
 
