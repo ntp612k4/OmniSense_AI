@@ -1,3 +1,4 @@
+import csv
 import io
 import os
 import sqlite3
@@ -5,6 +6,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
+from io import StringIO
 
 import pandas as pd
 import torch
@@ -236,6 +238,37 @@ def find_text_column(df: pd.DataFrame) -> str | None:
     return None
 
 
+def find_named_column(df: pd.DataFrame, name: str) -> str | None:
+    normalized = {col.lower().strip(): col for col in df.columns}
+    return normalized.get(name)
+
+
+def decode_csv_bytes(raw: bytes) -> str:
+    for encoding in ("utf-8-sig", "utf-8", "cp1252"):
+        try:
+            return raw.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    return raw.decode("utf-8", errors="replace")
+
+
+def read_csv_flexible(raw: bytes) -> pd.DataFrame:
+    df = pd.read_csv(io.BytesIO(raw))
+    if find_text_column(df):
+        return df
+
+    text = decode_csv_bytes(raw)
+    outer_rows = list(csv.reader(StringIO(text)))
+    if not outer_rows or any(len(row) != 1 for row in outer_rows):
+        return df
+
+    inner_lines = [row[0] for row in outer_rows if row and row[0].strip()]
+    if not inner_lines or "," not in inner_lines[0]:
+        return df
+
+    return pd.read_csv(StringIO("\n".join(inner_lines)))
+
+
 def predict_text(text: str, ai_system: dict, model_name: str, workspace: str, source: str) -> dict:
     tokenizer = ai_system["tokenizer"]
     model = ai_system["model"]
@@ -362,7 +395,7 @@ async def analyze_csv(
 ) -> dict:
     try:
         raw = await file.read()
-        df = pd.read_csv(io.BytesIO(raw))
+        df = read_csv_flexible(raw)
         text_col = find_text_column(df)
         if not text_col:
             raise HTTPException(
@@ -370,17 +403,21 @@ async def analyze_csv(
                 detail="CSV must contain one text column: review, text, content, comment, feedback, or message.",
             )
 
-        texts = (
-            df[text_col]
-            .dropna()
-            .astype(str)
-            .str.strip()
-            .loc[lambda values: values != ""]
-            .head(max(1, min(max_rows, 500)))
-            .tolist()
-        )
+        source_col = find_named_column(df, "source")
+        clean_df = df.copy()
+        clean_df[text_col] = clean_df[text_col].astype(str).str.strip()
+        clean_df = clean_df[clean_df[text_col] != ""].head(max(1, min(max_rows, 500)))
         ai_system = load_ai_model(model_name)
-        rows = [predict_text(text, ai_system, model_name, workspace, source) for text in texts]
+        rows = [
+            predict_text(
+                row[text_col],
+                ai_system,
+                model_name,
+                workspace,
+                str(row[source_col]).strip() if source_col and str(row[source_col]).strip() else source,
+            )
+            for _, row in clean_df.iterrows()
+        ]
         save_events(rows)
         return {"rows": rows, "metrics": summarize(rows), "text_column": text_col}
     except HTTPException:
